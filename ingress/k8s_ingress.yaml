@@ -1,0 +1,15 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: simple-nginx-example
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: k8s.tae-tea.net
+    http:
+      paths:
+      - path: /
+        backend:
+        serviceName: kubernetes-dashboard
+        servicePort: 80
