@@ -1,15 +1,15 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: simple-nginx-example
+  name: monitoring-influxdb-ingress
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
-  - host: k8s.tae-tea.net
+  - host: influxdb.tae-tea.net
     http:
       paths:
       - path: /
         backend:
-        serviceName: kubernetes-dashboard
-        servicePort: 80
+        serviceName: monitoring-influxdb
+        servicePort: 8086
