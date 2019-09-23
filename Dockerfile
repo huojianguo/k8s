@@ -1,2 +1,2 @@
-From jimmidyson/configmap-reload:v0.1
+From prom/prometheus:v2.2.1
 MAINTAINER tom_and_sorry <huojianguo@foxmail.com>
