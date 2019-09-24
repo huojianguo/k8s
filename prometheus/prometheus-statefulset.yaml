@@ -26,7 +26,7 @@ spec:
       serviceAccountName: prometheus
       initContainers:
       - name: "init-chown-data"
-        image: "busybox:latest"
+        image: "docker.tae-tea.net/k8s/busybox:latest"
         imagePullPolicy: "IfNotPresent"
         command: ["chown", "-R", "65534:65534", "/data"]
         volumeMounts:
@@ -35,7 +35,7 @@ spec:
           subPath: ""
       containers:
         - name: prometheus-server-configmap-reload
-          image: "jimmidyson/configmap-reload:v0.1"
+          image: "docker.tae-tea.net/k8s/configmap-reload:v0.1"
           imagePullPolicy: "IfNotPresent"
           args:
             - --volume-dir=/etc/config
@@ -53,7 +53,7 @@ spec:
               memory: 10Mi
 
         - name: prometheus-server
-          image: "prom/prometheus:v2.2.1"
+          image: "docker.tae-tea.net/k8s/prometheus:v2.2.1"
           imagePullPolicy: "IfNotPresent"
           args:
             - --config.file=/etc/config/prometheus.yml
