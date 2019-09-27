@@ -1,0 +1,43 @@
+// jenkins kubernetes 上线示例模版
+
+def label = "jnlp-test"
+def registry_url="docker.tae-tea.net"            //仓库地址
+def registry_username="admin"                    //仓库账号
+def registry_password="HarborAdm7542"            //仓库密码
+def images_name="docker.tae-tea.net/tanyp-test/kubernetes-nginx-test:${env.BUILD_ID}"
+def build_tag="${env.BUILD_ID}"
+
+podTemplate(label: label, cloud: 'kubernetes',containers: [
+    containerTemplate(
+        name: 'jnlp', 
+        image: 'docker.tae-tea.net/k8s/jnlp-slave:tanyp-1.8.2',
+        alwaysPullImage: true)
+  ],
+  volumes: [
+      hostPathVolume(mountPath: '/var/run/docker.sock',hostPath: '/var/run/docker.sock'),
+      hostPathVolume(mountPath: '/usr/bin/docker',hostPath: '/usr/bin/docker'),
+  ],
+  ) 
+  {
+
+node(label) {
+    stage('Clone') {
+      echo "1.Clone Stage"
+      checkout([$class: 'GitSCM', branches: [[name: '*/test']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '50034871-e692-4b8a-8485-f848928f1162', url: 'ssh://git@192.168.100.240/ops/tanyp.git']]])
+    }
+    stage('docker build') {
+      echo "=============Docker build=================="
+      sh """
+      pwd
+      docker login -u ${registry_username} -p ${registry_password} ${registry_url}
+      docker build -t ${images_name} .
+      docker push ${images_name}
+      """
+    }
+    stage('kubernetes') {
+      echo "kubernetes pod update"
+      sh "sed -i 's#<IMAGES_NAME>#${images_name}#' deploy/KubernetesPod.yaml"
+      kubernetesDeploy configs: 'deploy/KubernetesPod.yaml', kubeConfig: [path: ''], kubeconfigId: 'c5f69bc0-5c51-4a3d-806b-479bdfdbb0b7', secretName: '', ssh: [sshCredentialsId: '*', sshServer: ''], textCredentials: [certificateAuthorityData: '', clientCertificateData: '', clientKeyData: '', serverUrl: 'https://']
+    }
+}
+}

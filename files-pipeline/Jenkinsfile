@@ -1,0 +1,24 @@
+def label = "jnlp-slave"                          //kubernetes 标签
+
+podTemplate(label: label, cloud: 'kubernetes'
+  ) 
+  {
+
+node(label) {
+    stage('Clone') {
+      echo "1.Clone Stage"
+      sh 'pwd'
+    }
+    stage('docker build') {
+      echo "=============Docker build=================="
+      sh """
+      whoami
+      set
+      ls -al /usr/local/bin/
+      """
+    }
+        stage('maven-test') {
+            sh 'mvn -v'
+    }
+}
+}
